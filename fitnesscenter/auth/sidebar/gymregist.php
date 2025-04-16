@@ -1,9 +1,39 @@
 <?php
 session_start();
-
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
 if (!isset($_SESSION['user_id'])) {
-    header("Location: ../login.php");
+    echo "<script>alert('Anda harus login terlebih dahulu!'); window.location.href='login.php';</script>";
     exit;
+}
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    require_once '../../config/database.php';
+
+    $gym_name = $_POST['gym_name'];
+    $location = $_POST['location'];
+    $user_id = $_SESSION['user_id'];
+    $trainer_name = $_POST['trainer_name'];
+    $trainer_username = $_POST['trainer_username'];
+    $profile_picture = 'upload/gym_profile/default.png';
+    if (isset($_FILES['gym_profile_picture']) && $_FILES['gym_profile_picture']['error'] === 0) {
+        $uploadDir = '../../upload/gym_profile/';
+        $filename = time() . '_' . basename($_FILES['gym_profile_picture']['name']);
+        $uploadPath = $uploadDir . $filename;
+        if (move_uploaded_file($_FILES['gym_profile_picture']['tmp_name'], $uploadPath)) {
+            $profile_picture = $uploadPath;
+        }
+    }
+    try {
+        $stmtGym = $pdo->prepare("INSERT INTO gyms (user_id, gym_name, trainer_name, trainer_username, location, profile_picture) 
+                                  VALUES (?, ?, ?, ?, ?, ?)");
+        $stmtGym->execute([$user_id, $gym_name, $trainer_name, $trainer_username, $location, $profile_picture]);
+        $stmtTrainer = $pdo->prepare("INSERT INTO trainers (user_id, gym_id) VALUES (?, ?)");
+        $stmtTrainer->execute([$user_id, $gym_id]);
+        echo "<script>alert('Gym berhasil didaftarkan!'); window.location.href='gym_dashboard.php';</script>";
+    } catch (PDOException $e) {
+        echo "Error: " . $e->getMessage();
+    }
 }
 ?>
 <!DOCTYPE html>
@@ -53,45 +83,45 @@ if (!isset($_SESSION['user_id'])) {
     });
   </script>
     <div class="form-wrapper">
-    <form method="POST" enctype="multipart/form-data">
-    <div style="text-align: center; margin-bottom: 20px;">
-        <div style="position: relative; width: 450px; height: 200px; margin: auto;">
-        <img id="gymProfilePreview" 
-            src="upload/gym_profile/default.png" 
-            style="width: 450px; height: 200px; border-radius: 8px; object-fit: cover; background: transparent;">
-            
-        <label for="gym_profile_picture" 
-                style="position: absolute; bottom: 0; right: 0; background: #2196F3; 
-                        width: 30px; height: 30px; border-radius: 50%; color: white; 
-                        text-align: center; font-size: 20px; cursor: pointer; line-height: 30px;">
-            +
-        </label>
-        <input type="file" id="gym_profile_picture" name="gym_profile_picture" accept="image/*" style="display: none;" onchange="previewGymImage(event)">
-        </div>
-    </div>
-    <script>
-    function previewGymImage(event) {
-    const input = event.target;
-    const reader = new FileReader();
+        <form method="POST" enctype="multipart/form-data">
+            <div style="text-align: center; margin-bottom: 20px;">
+                <div style="position: relative; width: 450px; height: 200px; margin: auto;">
+                <img id="gymProfilePreview" 
+                    src="upload/gym_profile/default.png" 
+                    style="width: 450px; height: 200px; border-radius: 8px; object-fit: cover; background: transparent;">
+                    
+                <label for="gym_profile_picture" 
+                        style="position: absolute; bottom: 0; right: 0; background: #2196F3; 
+                                width: 30px; height: 30px; border-radius: 50%; color: white; 
+                                text-align: center; font-size: 20px; cursor: pointer; line-height: 30px;">
+                    +
+                </label>
+                <input type="file" id="gym_profile_picture" name="gym_profile_picture" accept="image/*" style="display: none;" onchange="previewGymImage(event)">
+                </div>
+            </div>
+            <script>
+            function previewGymImage(event) {
+            const input = event.target;
+            const reader = new FileReader();
 
-    reader.onload = function () {
-        const imgElement = document.getElementById('gymProfilePreview');
-        imgElement.src = reader.result;
-    };
+            reader.onload = function () {
+                const imgElement = document.getElementById('gymProfilePreview');
+                imgElement.src = reader.result;
+            };
 
-    if (input.files && input.files[0]) {
-        reader.readAsDataURL(input.files[0]);
-    }
-    }
-    </script>
-        <h2>Register Your Gym</h2>
-        <input type="text" name="gym_name" placeholder="Gym Name" required />
-        <input type="text" name="location" placeholder="Location" required />
-        <input type="hidden" name="trainer_id" value="<?php echo $user_id; ?>" />
-        <input type="hidden" name="trainer_username" value="<?php echo $username; ?>" />
-        <input type="hidden" name="trainer_name" value="<?php echo $fullname; ?>" />
-        <button type="submit">Submit</button>
-    </form>
+            if (input.files && input.files[0]) {
+                reader.readAsDataURL(input.files[0]);
+            }
+            }
+            </script>
+                <h2>Register Your Gym</h2>
+                <input type="text" name="gym_name" placeholder="Gym Name" required />
+                <input type="text" name="location" placeholder="Location" required />
+                <input type="hidden" name="trainer_id" value="<?php echo $user_id; ?>" />
+                <input type="hidden" name="trainer_username" value="<?php echo $username; ?>" />
+                <input type="hidden" name="trainer_name" value="<?php echo $fullname; ?>" />
+                <button type="submit">Submit</button>
+        </form>
     </div>
 </body>
 </html>
