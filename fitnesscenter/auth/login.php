@@ -1,56 +1,59 @@
 <?php
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
+
 session_start();
 require_once "../config/database.php";
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $identifier = trim($_POST['identifier']); // username atau email
+    $identifier = trim($_POST['identifier']);
     $password   = $_POST['password'];
-
     $query = "SELECT * FROM users WHERE username = :identifier OR email = :identifier LIMIT 1";
     $stmt = $pdo->prepare($query);
     $stmt->execute(['identifier' => $identifier]);
     $user = $stmt->fetch(PDO::FETCH_ASSOC);
-
     if ($user && password_verify($password, $user['password'])) {
-        // Simpan data ke session
         $_SESSION['user_id']  = $user['id'];
         $_SESSION['username'] = $user['username'];
         $_SESSION['fullname'] = $user['fullname'];
-
-        // Redirect ke dashboard
-        header("Location: dashboard/dashboard.php");
+        header("Location: dashboard.php");
         exit;
     } else {
-        echo "❌ Username/email atau password salah.";
+        echo "<script>alert('❌ Username/email atau password salah.'); window.location.href='login.php';</script>";
+        exit;
     }
 }
 ?>
+
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Login</title>
-  <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
-</head>
-<body>
-  <header>
-    <nav>
-        <a class="logo">NewHeat <span>Pro</span></a>
-        <div class="top-btn">
-        <span class="text">Don't Have an Account?</span>
-        <a href="signup.php" class="loginbtn">Sign Up</a>
-        </div>
-    </nav>
-  </header>
-  <div class="form-wrapper">
-    <form method="POST">
-      <h2>Login</h2>
-        <input type="text" name="identifier" placeholder="Username or Email" required />
-        <input type="password" name="password" placeholder="Password" required />
-        <button type="submit">Login</button>
-    </form>
-  </div>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Login</title>
+    <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
+  </head>
+  <body>
+    <header>
+      <nav>
+          <a class="logo">NewHeat <span>Pro</span></a>
+          <div class="top-btn">
+          <span class="text">Don't Have an Account?</span>
+          <a href="signup.php" class="loginbtn">Sign Up</a>
+          </div>
+      </nav>
+    </header>
+    <div class="form-wrapper">
+      <form method="POST">
+        <h2>Login</h2>
+          <input type="text" name="identifier" placeholder="Username or Email" required />
+          <input type="password" name="password" placeholder="Password" required />
+          <button type="submit">Login</button>
+      </form>
+    </div>
+  </body>
+</html>
 <style>
   :root {
     --bg-color: #000;

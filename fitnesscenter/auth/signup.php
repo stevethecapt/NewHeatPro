@@ -22,7 +22,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $_SESSION['user_id'] = $user_id;
         $_SESSION['username'] = $username;
         $_SESSION['fullname'] = $fullname;
-        header("Location: dashboard/dashboard.php");
+        header("Location: dashboard.php");
         exit;
     } catch (PDOException $e) {
         if ($e->getCode() == 23000) {
@@ -35,32 +35,34 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 ?>
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Sign Up</title>
-  <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
-</head>
-<body>
-  <header>
-    <nav>
-        <a class="logo">NewHeat <span>Pro</span></a>
-        <div class="top-btn">
-        <span class="text">Already have an Account?</span>
-        <a href="login.php" class="loginbtn">Login</a>
-        </div>
-    </nav>
-  </header>
-  <div class="form-wrapper">
-    <form method="POST">
-      <h2>Sign Up</h2>
-        <input type="text" name="fullname" placeholder="Full Name" required />
-        <input type="text" name="username" placeholder="Username" required />
-        <input type="email" name="email" placeholder="Email Address" required />
-        <input type="password" name="password" placeholder="Password" required />
-        <button type="submit">Sign Up</button>
-    </form>
-  </div>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Sign Up</title>
+    <link href="https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css" rel="stylesheet">
+  </head>
+  <body>
+    <header>
+      <nav>
+          <a class="logo">NewHeat <span>Pro</span></a>
+          <div class="top-btn">
+          <span class="text">Already have an Account?</span>
+          <a href="login.php" class="loginbtn">Login</a>
+          </div>
+      </nav>
+    </header>
+    <div class="form-wrapper">
+      <form method="POST">
+        <h2>Sign Up</h2>
+          <input type="text" name="fullname" placeholder="Full Name" required />
+          <input type="text" name="username" placeholder="Username" required />
+          <input type="email" name="email" placeholder="Email Address" required />
+          <input type="password" name="password" placeholder="Password" required />
+          <button type="submit">Sign Up</button>
+      </form>
+    </div>
+  </body>
+</html>
 <style>
   :root {
     --bg-color: #000;

@@ -1,3 +1,6 @@
+<?php
+session_start();
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -10,10 +13,11 @@
   <header>
     <nav>
         <a class="logo">NewHeat <span>Pro</span></a>
-        <div class="top-btn">
-        <a href="signup.php" class="nav-btn">Sign Up</a>
-        <a href="login.php" class="nav-btn">Login</a>
-        </div>
+        <?php if (isset($_SESSION['username'])): ?>
+          <span class="nav-user"><?php echo htmlspecialchars($_SESSION['username']); ?></span>
+        <?php else: ?>
+          <a href="login.php" class="nav-btn">Login</a>
+        <?php endif; ?>
     </nav>
   </header>
   <div class="text-container">
@@ -35,7 +39,7 @@
         }, 2500);
         </script>
   </div>
-  <a href="dashboard/dashboard.php" class="startnow-btn">Start Now</a>
+  <a href="dashboard.php" class="startnow-btn">Start Now</a>
 </body>
 </html>
 <style>
